@@ -4,22 +4,6 @@
     <meta charset="utf-8">
     <title>サンプル</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript">
-        $(function(){
-            const base_url = ""; // Spreadsheet API URL
-            $('input[name="send"]').click(function(){
-                var url = base_url + $('input[name="id"]').val();
-                $.getJSON(url, (data) => {
-                    console.log(data);
-                    $('#title_en').html(data.session_title_en);
-                    $('#title_jp').html(data.session_title_jp);
-                    $('#detail').html(data.detail);
-                    $('#speaker').html(data.speaker);
-                    $('#share').attr('src', data.share_url);
-                });
-            });
-        });
-    </script>
     <style type="text/css">
         body{
             background-color: #1A1A1A;
@@ -47,6 +31,35 @@
     </div>
     <video id="video-player" style="display: none;"></video>
     <script src="https://player.live-video.net/1.5.0/amazon-ivs-player.min.js"></script>
+    <script>
+      const speakerIdInput = document.querySelector('input[name="id"]');
+        const sendButton = document.querySelector('input[name="send"]');
+
+        sendButton.addEventListener('click', () => {
+          console.log('click');
+          getData();
+        });
+
+        async function getData() {
+          const id = speakerIdInput.value;
+          const url = `https://script.google.com/macros/s/AKfycbw3lQF7F-v0q73zDxA4g92mqz-C1kFUAGly92JjN3MIgwgWPYlc5me0FFTdxE_pDwHRoQ/exec?id=${id}`;
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`Response status: ${response.status}`);
+            }
+
+            const json = await response.json();
+            document.getElementById('title_en').textContent = json.session_title_en;
+            document.getElementById('title_jp').textContent = json.session_title_jp;
+            document.getElementById('speaker').textContent = json.speaker;
+            document.getElementById('detail').textContent = json.detail;
+            document.getElementById('share').src = json.share_url;
+          } catch (error) {
+            console.error(error.message);
+          }
+        }
+    </script>
     <script>
       if (IVSPlayer.isPlayerSupported) {
         const player = IVSPlayer.create();
